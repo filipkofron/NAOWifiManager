@@ -4,6 +4,7 @@
  * found in the COPYING file.
  */
 #include <iostream>
+#define BOOST_SIGNALS_NO_DEPRECATION_WARNING
 #include <alcommon/almodule.h>
 #include <alcommon/albroker.h>
 #include <alcommon/albrokermanager.h>
@@ -11,10 +12,11 @@
 #include "config.h"
 #include "globals.h"
 
-std::shared_ptr<ParamEntry> _config;
-extern WifiManager _glob_WifiManager;
-extern MenuController _glob_GMenuController;
-extern std::shared_ptr<AL::ALConnectionManagerProxy> _glob_connectionManagerProxy;
+std::shared_ptr<ParamEntry> _glob_config;
+WifiManager _glob_WifiManager;
+MenuController _glob_GMenuController;
+std::shared_ptr<AL::ALConnectionManagerProxy> _glob_connectionManagerProxy;
+std::shared_ptr<AL::ALTextToSpeechProxy> _glob_textToSpeechProxy;
 
 #ifdef MYMODULE_IS_REMOTE
 # define ALCALL
@@ -53,10 +55,8 @@ int main()
   ParamEntry::Reload();
   std::cout << "Config:" << std::endl;
   GetConfig().PrintOn(std::cout);
-  int pport = 9559;
-  //std::string pip = "192.168.56.102";
-  // std::string pip = "10.10.48.252";
-  std::string pip = "192.168.0.100";
+  int pport = NAO_PORT;
+  std::string pip = NAO_IP;
 
   // Need this to for SOAP serialization of floats to work
   setlocale(LC_NUMERIC, "C");

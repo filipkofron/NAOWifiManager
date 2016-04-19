@@ -1,5 +1,6 @@
 #pragma once
 
+#define BOOST_SIGNALS_NO_DEPRECATION_WARNING
 #include <alcommon/almodule.h>
 #include <alproxies/alconnectionmanagerproxy.h>
 #include <alproxies/almemoryproxy.h>
@@ -10,6 +11,7 @@ namespace AL
   // This is a forward declaration of AL:ALBroker which
   // avoids including <alcommon/albroker.h> in this header
   class ALBroker;
+  void Say(const std::string& message);
 }
 
 /**
@@ -19,7 +21,6 @@ namespace AL
 class WifiModule : public AL::ALModule
 {
 protected:
-  std::shared_ptr<AL::ALConnectionManagerProxy> _connectionManagerProxy;
   AL::ALMemoryProxy _memoryProxy;
   std::vector<IInputEventHandler*> _inputSubscribers;
   std::vector<INetworkEventHandler*> _networkSubscribers;

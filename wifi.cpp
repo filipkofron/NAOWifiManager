@@ -5,18 +5,27 @@
 #include <iostream>
 #include <alcommon/albroker.h>
 
-// #define LOCAL_IP "127.0.0.1"
-// #define LOCAL_IP "10.10.48.252"
-#define LOCAL_IP "192.168.0.100"
-#define LOCAL_PORT 9559
+namespace AL
+{
+  void Say(const std::string& message)
+  {
+    GetTextToSpeechProxy().say("Hello world from c plus plus");
+  }
+}
+
+template <typename Proxy>
+std::shared_ptr<Proxy> InitProxy()
+{
+  return std::shared_ptr<Proxy>(new Proxy(NAO_IP, NAO_PORT));
+}
 
 WifiModule::WifiModule(boost::shared_ptr<AL::ALBroker> broker,
                    const std::string& name)
   : AL::ALModule(broker, name),
-    _connectionManagerProxy(new AL::ALConnectionManagerProxy(LOCAL_IP, LOCAL_PORT)),
-    _memoryProxy(LOCAL_IP, LOCAL_PORT)
+    _memoryProxy(NAO_IP, NAO_PORT)
 {
-  _glob_connectionManagerProxy = _connectionManagerProxy;
+  _glob_connectionManagerProxy = InitProxy<AL::ALConnectionManagerProxy>();
+  _glob_textToSpeechProxy = InitProxy<AL::ALTextToSpeechProxy>();
   // Describe the module here. This will appear on the webpage
   setModuleDescription("My own custom module.");
 
@@ -79,35 +88,31 @@ void WifiModule::OnRearTactilTouched()
 void WifiModule::OnChestSimpleClick()
 {
   std::cout << "You chest simple clicked me" << std::endl;
+
+  for (auto& subscriber : _inputSubscribers)
+    subscriber->OnEnter();
 }
 
 void WifiModule::OnChestTripleClick()
 {
   std::cout << "You chest triple clicked me" << std::endl;
+
+  for (auto& subscriber : _inputSubscribers)
+    subscriber->OnEnter();
 }
 
 void WifiModule::OnNetworkServiceInputRequired(const AL::ALValue& inputRequest)
 {
   std::cout << "OnNetworkServiceInputRequired: " << inputRequest << std::endl;
-  AL::ALValue input;
-  input.arraySetSize(2);
 
-  AL::ALValue user;
-  user.arraySetSize(2);
-  user[0] = "Username";
-  user[1] = "kofrofil@fit.cvut.cz";
-
-  AL::ALValue pass;
-  pass.arraySetSize(2);
-  pass[0] = "Password";
-  pass[1] = "BysChtelVedet";
-
-  input[0] = user;
-  input[1] = pass;
-  GetConnectionProxy().setServiceInput(input);
+  for (auto& subscriber : _networkSubscribers)
+    subscriber->OnNetworkServiceInputRequired();
 }
 
 void WifiModule::OnNetworkConnectStatus(const AL::ALValue& status)
 {
   std::cout << "OnNetworkConnectStatus: " << status << std::endl;
+
+  for (auto& subscriber : _networkSubscribers)
+    subscriber->OnNetworkStatusChanged();
 }

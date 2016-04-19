@@ -50,7 +50,27 @@ void WifiManager::TestListWifi()
   GetConnectionProxy().connect(serviceOn);
 }
 
-virtual WifiManager::OnNetworkStatusChanged()
+void WifiManager::OnNetworkServiceInputRequired()
+{
+  AL::ALValue input;
+  input.arraySetSize(2);
+
+  AL::ALValue user;
+  user.arraySetSize(2);
+  user[0] = "Username";
+  user[1] = "kofrofil@fit.cvut.cz";
+
+  AL::ALValue pass;
+  pass.arraySetSize(2);
+  pass[0] = "Password";
+  pass[1] = "BysChtelVedet";
+
+  input[0] = user;
+  input[1] = pass;
+  GetConnectionProxy().setServiceInput(input);
+}
+
+void WifiManager::OnNetworkStatusChanged()
 {
 
 }

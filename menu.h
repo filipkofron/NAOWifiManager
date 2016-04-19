@@ -25,14 +25,17 @@ public:
 
   std::shared_ptr<IMenuHandler>& Handler() { return _handler; }
   std::string& Name() { return _name; }
+  virtual void Announce();
 };
 
 class Menu
 {
 private:
   std::vector<std::shared_ptr<MenuItem> > _items;
+  int _index;
   static std::unique_ptr<Menu> _instance;
 public:
+  Menu() : _index(0) { }
   Menu& Instance();
   void ClearItems();
   void AddItem(const std::shared_ptr<MenuItem>& item);
