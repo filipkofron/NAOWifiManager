@@ -17,5 +17,7 @@ public:
 
   const std::vector<WifiService>& Services() { return _services; }
 
+  void ChooseWifi(const std::string& name);
+
   virtual void TestListWifi();
 };

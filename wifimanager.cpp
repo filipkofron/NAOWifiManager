@@ -3,9 +3,12 @@
 
 WifiManager::WifiManager()
 {
-  TestListWifi();
 }
 
+void WifiManager::ChooseWifi(const std::string& name)
+{
+  _selectedSSID = name;
+}
 
 void WifiManager::TestListWifi()
 {

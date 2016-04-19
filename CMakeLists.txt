@@ -22,7 +22,7 @@ set(_srcs
 
 option(MYMODULE_IS_REMOTE
   "module is compiled as a remote module (ON or OFF)"
-  OFF)
+  ON)
 
 
 if(MYMODULE_IS_REMOTE)

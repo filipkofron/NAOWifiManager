@@ -13,6 +13,7 @@
 #include "globals.h"
 
 std::shared_ptr<ParamEntry> _glob_config;
+Menu _glob_menu;
 WifiManager _glob_WifiManager;
 MenuController _glob_GMenuController;
 std::shared_ptr<AL::ALConnectionManagerProxy> _glob_connectionManagerProxy;

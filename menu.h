@@ -3,9 +3,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "globals.h"
-
-#include "eventhandler.h"
 
 class IMenuHandler
 {
@@ -33,10 +30,8 @@ class Menu
 private:
   std::vector<std::shared_ptr<MenuItem> > _items;
   int _index;
-  static std::unique_ptr<Menu> _instance;
 public:
   Menu() : _index(0) { }
-  Menu& Instance();
   void ClearItems();
   void AddItem(const std::shared_ptr<MenuItem>& item);
   void OnUp();

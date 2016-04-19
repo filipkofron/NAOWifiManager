@@ -21,6 +21,8 @@ namespace AL
 class WifiModule : public AL::ALModule
 {
 protected:
+  int _scrollPosUp;
+  int _scrollPosDown;
   AL::ALMemoryProxy _memoryProxy;
   std::vector<IInputEventHandler*> _inputSubscribers;
   std::vector<INetworkEventHandler*> _networkSubscribers;

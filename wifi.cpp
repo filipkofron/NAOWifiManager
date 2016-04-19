@@ -28,6 +28,8 @@ WifiModule::WifiModule(boost::shared_ptr<AL::ALBroker> broker,
   _glob_textToSpeechProxy = InitProxy<AL::ALTextToSpeechProxy>();
   // Describe the module here. This will appear on the webpage
   setModuleDescription("My own custom module.");
+  _scrollPosUp = -1;
+  _scrollPosDown = -1;
 
   functionName("OnFrontTactilTouched", getName(), "React to OnFrontTactilTouched.");
   BIND_METHOD(WifiModule::OnFrontTactilTouched);
@@ -68,21 +70,46 @@ void WifiModule::init()
   _memoryProxy.subscribeToEvent("ALChestButton/TripleClickOccured", "WifiModule", "OnChestTripleClick");
   _memoryProxy.subscribeToEvent("NetworkServiceInputRequired", "WifiModule", "OnNetworkServiceInputRequired");
   _memoryProxy.subscribeToEvent("NetworkConnectStatus", "WifiModule", "OnNetworkConnectStatus");
+
+  GetWifiManager().TestListWifi();
 }
 
 void WifiModule::OnFrontTactilTouched()
 {
   std::cout << "You touched meeah on front" << std::endl;
+
+  _scrollPosUp = 0;
+  if (_scrollPosDown == 1)
+  {
+    for (auto& subscriber : _inputSubscribers)
+      subscriber->OnDown();
+  }
+  _scrollPosDown = -1;
 }
 
 void WifiModule::OnMiddleTactilTouched()
 {
   std::cout << "You touched meeah on center" << std::endl;
+
+  if (_scrollPosDown == 0)
+    _scrollPosDown = 1;
+
+  if (_scrollPosUp == 0)
+    _scrollPosUp = 1;
 }
 
 void WifiModule::OnRearTactilTouched()
 {
   std::cout << "You touched meeah on rear" << std::endl;
+
+  _scrollPosDown = 0;
+  if (_scrollPosUp == 1)
+  {
+    for (auto& subscriber : _inputSubscribers)
+      subscriber->OnUp();
+  }
+
+  _scrollPosUp = -1;
 }
 
 void WifiModule::OnChestSimpleClick()
@@ -98,7 +125,7 @@ void WifiModule::OnChestTripleClick()
   std::cout << "You chest triple clicked me" << std::endl;
 
   for (auto& subscriber : _inputSubscribers)
-    subscriber->OnEnter();
+    subscriber->OnStart();
 }
 
 void WifiModule::OnNetworkServiceInputRequired(const AL::ALValue& inputRequest)
