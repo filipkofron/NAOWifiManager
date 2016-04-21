@@ -9,7 +9,7 @@ namespace AL
 {
   void Say(const std::string& message)
   {
-#if LOCAL_TEST && 1
+#if LOCAL_TEST && 0
     std::cout << "Would say: " << message << std::endl;
 #else // LOCAL_TEST
     std::cout << "Would say: " << message << std::endl;
@@ -89,13 +89,13 @@ void WifiModule::init()
   OnChestTripleClick();
   OnChestSimpleClick();
 
- /* OnRearTactilTouched();
+  OnRearTactilTouched();
   OnMiddleTactilTouched();
   OnFrontTactilTouched();
 
   OnRearTactilTouched();
   OnMiddleTactilTouched();
-  OnFrontTactilTouched();*/
+  OnFrontTactilTouched();
 
   OnChestSimpleClick();
 
@@ -156,7 +156,7 @@ void WifiModule::OnChestTripleClick()
     subscriber->OnStart();
 }
 
-void WifiModule::OnNetworkServiceInputRequired(const std::string& eventName, const AL::ALValue& inputRequest)
+void WifiModule::OnNetworkServiceInputRequired(const AL::ALValue& inputRequest)
 {
   std::cout << "OnNetworkServiceInputRequired: " << inputRequest << std::endl;
 
@@ -164,18 +164,18 @@ void WifiModule::OnNetworkServiceInputRequired(const std::string& eventName, con
     subscriber->OnNetworkServiceInputRequired();
 }
 
-void WifiModule::OnNetworkConnectStatus(const std::string& eventName, const AL::ALValue& status)
+void WifiModule::OnNetworkConnectStatus(const AL::ALValue& status)
 {
   std::cout << "OnNetworkConnectStatus: " << status << std::endl;
 
   for (auto& subscriber : _networkSubscribers)
-    subscriber->OnNetworkConnectStatus(status[1].toString());
+    subscriber->OnNetworkConnectStatus(status[1]);
 }
 
-void WifiModule::OnNetworkStatusChanged(const std::string& eventName, const AL::ALValue& status)
+void WifiModule::OnNetworkStatusChanged(const AL::ALValue& status)
 {
   std::cout << "OnNetworkStatusChanged: " << status << std::endl;
 
   for (auto& subscriber : _networkSubscribers)
-    subscriber->OnNetworkStatusChanged((std::string) status);
+    subscriber->OnNetworkStatusChanged(status);
 }

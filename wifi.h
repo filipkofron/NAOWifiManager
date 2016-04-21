@@ -43,6 +43,7 @@ public:
   virtual void OnRearTactilTouched();
   virtual void OnChestSimpleClick();
   virtual void OnChestTripleClick();
-  virtual void OnNetworkServiceInputRequired(const AL::ALValue& inputRequest);
-  virtual void OnNetworkConnectStatus(const AL::ALValue& status);
+  virtual void OnNetworkServiceInputRequired(const std::string& eventName, const AL::ALValue& inputRequest);
+  virtual void OnNetworkConnectStatus(const std::string& eventName, const AL::ALValue& status);
+  virtual void OnNetworkStatusChanged(const std::string& eventName, const AL::ALValue& status);
 };

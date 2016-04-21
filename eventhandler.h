@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 class IInputEventHandler
 {
 public:
@@ -14,6 +16,7 @@ class INetworkEventHandler
 {
 public:
   virtual ~INetworkEventHandler() { }
-  virtual void OnNetworkStatusChanged() = 0;
+  virtual void OnNetworkConnectStatus(const std::string& status) = 0;
+  virtual void OnNetworkStatusChanged(const std::string& status) = 0;
   virtual void OnNetworkServiceInputRequired() = 0;
 };

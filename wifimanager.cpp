@@ -17,7 +17,7 @@ std::string WifiManager::GetConnectedToAnyId() const
 {
   for (const auto& service : _services)
   {
-    if (service._state == WifiState::Online)
+    if (service._state == WifiState::Online || service._state == WifiState::Idle)
       return service.Id();
   }
   return "";
@@ -38,7 +38,7 @@ void WifiManager::Disconnect()
   if (IsConnectedToAny())
   {
     AL::Say("Odpojuji se");
-    // GetConnectionProxy().disconnect(GetConnectedToAnyId());
+    //GetConnectionProxy().disconnect(GetConnectedToAnyId());
   }
 }
 
@@ -47,7 +47,7 @@ void WifiManager::Connect()
   if (IsSelectedNetworkAvailable())
   {
     AL::Say("Připojuji se k " + _selectedSSID);
-    // GetConnectionProxy().connect(GetSelectedId());
+    GetConnectionProxy().connect(GetSelectedId());
   }
 }
 
@@ -67,17 +67,28 @@ void WifiManager::OnNetworkServiceInputRequired()
   if (config->_enterprise)
   {
     input.arraySetSize(2);
-    AL::ALValue user;
+
+    AL::ALValue identity;
+    identity.arraySetSize(2);
+    identity[0] = "Identity";
+    identity[1] = config->_username;
+
+    /*AL::ALValue user;
     user.arraySetSize(2);
     user[0] = "Username";
-    user[1] = config->_username;
+    user[1] = config->_username;*/
 
     AL::ALValue pass;
     pass.arraySetSize(2);
     pass[0] = "Password";
     pass[1] = config->_password;
-    input[0] = user;
+
+    input[0] = identity;
     input[1] = pass;
+
+    //input[0] = user;
+    //input[1] = identity;
+    //input[2] = pass;
   }
   else
   {
@@ -147,7 +158,7 @@ bool WifiManager::IsConnectedToSelected() const
 {
   for (const auto& service : _services)
   {
-    if (service._name == _selectedSSID && service._state == WifiState::Online)
+    if (service._name == _selectedSSID && (service._state == WifiState::Online|| service._state == WifiState::Idle))
       return true;
   }
   return false;
@@ -158,13 +169,21 @@ bool WifiManager::IsConnectedToAny() const
 {
   for (const auto& service : _services)
   {
-    if (service._state == WifiState::Online)
+    if (service._state == WifiState::Online || service._state == WifiState::Idle)
       return true;
   }
   return false;
 }
 
-void WifiManager::OnNetworkStatusChanged()
+void WifiManager::OnNetworkConnectStatus(const std::string& status)
+{
+  if (status == "true")
+    AL::Say("Připojen k " + _selectedSSID);
+  else
+    AL::Say("Připojení k " + _selectedSSID + " selhalo");
+}
+
+void WifiManager::OnNetworkStatusChanged(const std::string& status)
 {
   UpdateList();
 

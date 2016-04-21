@@ -19,7 +19,8 @@ private:
 
 public:
   WifiManager();
-  virtual void OnNetworkStatusChanged();
+  virtual void OnNetworkConnectStatus(const std::string& status);
+  virtual void OnNetworkStatusChanged(const std::string& status);
   virtual void OnNetworkServiceInputRequired();
   void UpdateList();
 
