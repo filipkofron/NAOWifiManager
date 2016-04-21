@@ -11,12 +11,18 @@
 #ifdef MYMODULE_IS_REMOTE
   // #define NAO_IP "127.0.0.1"
   // #define NAO_IP "10.10.48.252"
-  #define NAO_IP "192.168.0.100"
+  // #define NAO_IP "192.168.0.100"
+  #define NAO_IP "192.168.0.114"
   #define NAO_PORT 9559
 #else // MYMODULE_IS_REMOTE
   #define NAO_IP "127.0.0.1"
   #define NAO_PORT 9559
 #endif // MYMODULE_IS_REMOTE
+
+#define LOCAL_TEST_ENABLE 1
+#if LOCAL_TEST_ENABLE && defined(MYMODULE_IS_REMOTE)
+  #define LOCAL_TEST 1
+#endif
 
 extern std::shared_ptr<ParamEntry> _glob_config;
 extern Menu _glob_menu;

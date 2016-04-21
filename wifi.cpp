@@ -9,7 +9,11 @@ namespace AL
 {
   void Say(const std::string& message)
   {
-    GetTextToSpeechProxy().say("Hello world from c plus plus");
+#if LOCAL_TEST
+    std::cout << "Would say: message" << std::endl;
+#else // LOCAL_TEST
+    GetTextToSpeechProxy().say(message);
+#endif // LOCAL_TEST
   }
 }
 

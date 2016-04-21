@@ -1,8 +1,6 @@
 #include "menu.h"
 #include "wifi.h"
 
-
-
 void MenuItem::Announce()
 {
   AL::Say(_name);

@@ -1,6 +1,15 @@
 #include "menucontrol.h"
 #include "globals.h"
+#include "wifi.h"
 #include <iostream>
+
+std::shared_ptr<MenuItem> MakeItem(const std::string& name, IMenuHandler* handler)
+{
+  std::shared_ptr<MenuItem> menuItem(new MenuItem);
+  menuItem->Name() = name;
+  menuItem->Handler() = std::shared_ptr<IMenuHandler>(handler);
+  return menuItem;
+}
 
 void MenuController::OnUp()
 {
@@ -29,7 +38,7 @@ public:
 
   virtual void Handle() override
   {
-    AL::Say("Vybiram wifi " + _name);
+    AL::Say("Zvolena sit " + _name);
     GetWifiManager().ChooseWifi(_name);
   }
 };
@@ -47,17 +56,9 @@ public:
   }
 };
 
-std::shared_ptr<MenuItem> MakeItem(const std::string& name, IMenuHandler* handler)
-{
-  std::shared_ptr<MenuItem> menuItem(new MenuItem);
-  menuItem->Name() = name;
-  menuItem->Handler() = std::shared_ptr<IMenuHandler>(handler);
-  return menuItem;
-}
-
 void MenuController::OnStart()
 {
   GetMenu().ClearItems();
 
-  GetMenu().AddItem(MakeItem("Vybrat Wifi", new ChooseWifiMenuEnterHandler));
+  GetMenu().AddItem(MakeItem("Vybrat sit", new ChooseWifiMenuEnterHandler));
 }
