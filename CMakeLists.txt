@@ -5,7 +5,7 @@ find_package(qibuild)
 
 FILE(GLOB_RECURSE INC_ALL "*.h")
 
-SET(CMAKE_CXX_FLAGS "-std=gnu++11")
+SET(CMAKE_CXX_FLAGS "-std=gnu++11 -ggdb -O0")
 
 set(_srcs
  "config.cpp"

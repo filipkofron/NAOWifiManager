@@ -9,11 +9,16 @@ namespace AL
 {
   void Say(const std::string& message)
   {
-#if LOCAL_TEST
-    std::cout << "Would say: message" << std::endl;
+#if LOCAL_TEST && 0
+    std::cout << "Would say: " << message << std::endl;
 #else // LOCAL_TEST
+    std::cout << "Would say: " << message << std::endl;
+    GetTextToSpeechProxy().setLanguage("Czech");
     GetTextToSpeechProxy().say(message);
 #endif // LOCAL_TEST
+
+
+    // std::cout << GetTextToSpeechProxy().getAvailableLanguages() << std::endl;
   }
 }
 
@@ -28,8 +33,8 @@ WifiModule::WifiModule(boost::shared_ptr<AL::ALBroker> broker,
   : AL::ALModule(broker, name),
     _memoryProxy(NAO_IP, NAO_PORT)
 {
-  _glob_connectionManagerProxy = InitProxy<AL::ALConnectionManagerProxy>();
-  _glob_textToSpeechProxy = InitProxy<AL::ALTextToSpeechProxy>();
+  _globs->_glob_connectionManagerProxy = InitProxy<AL::ALConnectionManagerProxy>();
+  _globs->_glob_textToSpeechProxy = InitProxy<AL::ALTextToSpeechProxy>();
   // Describe the module here. This will appear on the webpage
   setModuleDescription("My own custom module.");
   _scrollPosUp = -1;
@@ -75,7 +80,23 @@ void WifiModule::init()
   _memoryProxy.subscribeToEvent("NetworkServiceInputRequired", "WifiModule", "OnNetworkServiceInputRequired");
   _memoryProxy.subscribeToEvent("NetworkConnectStatus", "WifiModule", "OnNetworkConnectStatus");
 
-  GetWifiManager().TestListWifi();
+  // THIS MUST BE ENABLED
+  // OnNetworkConnectStatus(AL::ALValue());
+
+  OnChestTripleClick();
+  OnChestSimpleClick();
+
+  OnRearTactilTouched();
+  OnMiddleTactilTouched();
+  OnFrontTactilTouched();
+
+  OnRearTactilTouched();
+  OnMiddleTactilTouched();
+  OnFrontTactilTouched();
+
+  OnChestSimpleClick();
+
+  //OnChestSimpleClick();
 }
 
 void WifiModule::OnFrontTactilTouched()

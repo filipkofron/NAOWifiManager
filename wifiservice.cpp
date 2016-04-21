@@ -10,8 +10,10 @@ void WifiService::FindConfig()
     {
       auto config = std::shared_ptr<WifiConfig>(new WifiConfig);
       config->_username = service["username"];
-      config->_username = service["password"];
-      config->_default = service["password"] == "true";
+      config->_password = service["password"];
+      config->_enterprise = config->_password.length() > 0;
+      config->_passphrase = service["passphrase"];
+      config->_default = service["default"] == "true";
       _knownConfig = config;
       break;
     }

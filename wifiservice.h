@@ -6,8 +6,10 @@
 struct WifiConfig
 {
   bool _default;
+  bool _enterprise;
   std::string _username;
   std::string _password;
+  std::string _passphrase;
 };
 
 struct WifiService

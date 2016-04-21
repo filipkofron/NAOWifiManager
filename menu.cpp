@@ -49,8 +49,8 @@ void Menu::OnEnter()
   if (_items.size() == 0)
     return;
 
-  AL::Say("Zvoleno");
-  _items[_index]->Announce();
+  //AL::Say("Zvoleno");
+  //_items[_index]->Announce();
 
   if (_items[_index]->Handler())
     _items[_index]->Handler()->Handle();

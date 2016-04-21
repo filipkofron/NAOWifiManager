@@ -97,10 +97,10 @@ std::shared_ptr<ParamEntry> ParamEntry::_root;
 
 void ParamEntry::Reload()
 {
-  _glob_config = std::shared_ptr<ParamEntry>(new ParamEntry);
+  _globs->_glob_config = std::shared_ptr<ParamEntry>(new ParamEntry);
   auto file = std::shared_ptr<std::ifstream>(new std::ifstream(CHAR_READER_PATH));
   CharReader charReader(file);
-  _glob_config->Load(charReader);
+  _globs->_glob_config->Load(charReader);
 }
 
 

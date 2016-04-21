@@ -31,7 +31,7 @@ private:
   std::vector<std::shared_ptr<MenuItem> > _items;
   int _index;
 public:
-  Menu() : _index(0) { }
+  Menu() : _index(0) { _items.clear(); }
   void ClearItems();
   void AddItem(const std::shared_ptr<MenuItem>& item);
   void OnUp();

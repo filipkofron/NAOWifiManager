@@ -12,12 +12,7 @@
 #include "config.h"
 #include "globals.h"
 
-std::shared_ptr<ParamEntry> _glob_config;
-Menu _glob_menu;
-WifiManager _glob_WifiManager;
-MenuController _glob_GMenuController;
-std::shared_ptr<AL::ALConnectionManagerProxy> _glob_connectionManagerProxy;
-std::shared_ptr<AL::ALTextToSpeechProxy> _glob_textToSpeechProxy;
+std::unique_ptr<Globs> _globs = std::unique_ptr<Globs>(new Globs);
 
 #ifdef MYMODULE_IS_REMOTE
 # define ALCALL
@@ -106,7 +101,8 @@ int main()
   AL::ALModule::createModule<WifiModule>(broker, "WifiModule");
 
  // while (true)
-  for (int i = 0; i < 20; i++)
+
+  for (int i = 0; i < 60; i++)
   {
     std::cout << "will sleep for: " << (20 - i) << " seconds." << std::endl;
     qi::os::sleep(1);
