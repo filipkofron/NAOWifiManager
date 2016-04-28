@@ -9,14 +9,16 @@ SET(CMAKE_CXX_FLAGS "-std=gnu++11 -ggdb -O0")
 
 set(_srcs
  "config.cpp"
+ "eventhandler.cpp"
  "main.cpp"
  "menu.cpp"
  "menucontrol.cpp"
+ "scriptcommand.cpp"
  "wifi.cpp"
  "wifimanager.cpp"
+ "wifiscript.cpp"
  "wifiservice.cpp"
  "wifistate.cpp"
- "eventhandler.cpp"
  ${INC_ALL}
 )
 

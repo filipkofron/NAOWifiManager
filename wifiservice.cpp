@@ -3,19 +3,25 @@
 
 void WifiService::FindConfig()
 {
-  for (auto& servicePtr : GetConfig().Entries())
+  for (auto& wifi : GetConfig().Entries())
   {
-    auto service = *servicePtr;
-    if (service.Contains("name") && service["name"] == _name)
+    if (wifi->Contains("section") && (*wifi)["section"] == "Wifi")
     {
-      auto config = std::shared_ptr<WifiConfig>(new WifiConfig);
-      config->_username = service["username"];
-      config->_password = service["password"];
-      config->_enterprise = config->_password.length() > 0;
-      config->_passphrase = service["passphrase"];
-      config->_default = service["default"] == "true";
-      _knownConfig = config;
-      break;
+      for (auto& servicePtr : wifi->Entries())
+      {
+        auto service = *servicePtr;
+        if (service.Contains("name") && service["name"] == _name)
+        {
+          auto config = std::shared_ptr<WifiConfig>(new WifiConfig);
+          config->_username = service["username"];
+          config->_password = service["password"];
+          config->_enterprise = config->_password.length() > 0;
+          config->_passphrase = service["passphrase"];
+          config->_default = service["default"] == "true";
+          _knownConfig = config;
+          break;
+        }
+      }
     }
   }
 }

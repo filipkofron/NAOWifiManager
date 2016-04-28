@@ -1,0 +1,7 @@
+Choregraphe - NAOqi : 54010, 54011, 54012, ... ( as many as you have Choregraphe/Monitor instances running on the same computer).
+Choregraphe - ftp : 20, 21
+Choregraphe - http : 80
+Choregraphe - log : 50998, 50999
+Choregraphe - bonjour: 5353
+NAOqi: 9559
+NAO - webservices : 5222, 5223
