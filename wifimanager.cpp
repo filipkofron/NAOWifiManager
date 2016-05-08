@@ -15,20 +15,20 @@ void WifiManager::ChooseWifi(const std::string& name)
 
 std::string WifiManager::GetConnectedToAnyId() const
 {
-  for (const auto& service : _services)
+  for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
   {
-    if (service._state == WifiState::Online || service._state == WifiState::Idle)
-      return service.Id();
+    if (it->_state == WifiState::Online || it->_state == WifiState::Idle)
+      return it->Id();
   }
   return "";
 }
 
 std::string WifiManager::GetSelectedId() const
 {
-  for (const auto& service : _services)
+  for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
   {
-    if (service._name == _selectedSSID)
-      return service.Id();
+    if (it->_name == _selectedSSID)
+      return it->Id();
   }
   return "";
 }
@@ -53,11 +53,11 @@ void WifiManager::Connect()
 
 void WifiManager::OnNetworkServiceInputRequired()
 {
-  std::shared_ptr<WifiConfig> config;
-  for (auto& service : _services)
+  boost::shared_ptr<WifiConfig> config;
+  for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
   {
-    if (service._name == _selectedSSID)
-      config = service._knownConfig;
+    if (it->_name == _selectedSSID)
+      config = it->_knownConfig;
   }
   if (!config)
     return;
@@ -110,7 +110,7 @@ void WifiManager::UpdateList()
   std::string serviceOff;
   std::string serviceOn;
   GetConnectionProxy().scan();
-  auto serviceList = GetConnectionProxy().services();
+  AL::ALValue serviceList = GetConnectionProxy().services();
   _services.clear();
   for (int i = 0; i < serviceList.getSize(); i++)
   {
@@ -146,9 +146,9 @@ void WifiManager::UpdateList()
 
 bool WifiManager::IsSelectedNetworkAvailable() const
 {
-  for (const auto& service : _services)
+  for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
   {
-    if (service._name == _selectedSSID)
+    if (it->_name == _selectedSSID)
       return true;
   }
   return false;
@@ -156,9 +156,9 @@ bool WifiManager::IsSelectedNetworkAvailable() const
 
 bool WifiManager::IsConnectedToSelected() const
 {
-  for (const auto& service : _services)
+  for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
   {
-    if (service._name == _selectedSSID && (service._state == WifiState::Online|| service._state == WifiState::Idle))
+    if (it->_name == _selectedSSID && (it->_state == WifiState::Online || it->_state == WifiState::Idle))
       return true;
   }
   return false;
@@ -167,9 +167,9 @@ bool WifiManager::IsConnectedToSelected() const
 
 bool WifiManager::IsConnectedToAny() const
 {
-  for (const auto& service : _services)
+  for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
   {
-    if (service._state == WifiState::Online || service._state == WifiState::Idle)
+    if (it->_state == WifiState::Online || it->_state == WifiState::Idle)
       return true;
   }
   return false;

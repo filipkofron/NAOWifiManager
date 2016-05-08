@@ -5,7 +5,7 @@ find_package(qibuild)
 
 FILE(GLOB_RECURSE INC_ALL "*.h")
 
-SET(CMAKE_CXX_FLAGS "-std=gnu++11 -ggdb -O0")
+SET(CMAKE_CXX_FLAGS "-ggdb -O0")
 
 set(_srcs
  "config.cpp"
@@ -24,7 +24,7 @@ set(_srcs
 
 option(MYMODULE_IS_REMOTE
   "module is compiled as a remote module (ON or OFF)"
-  ON)
+  OFF)
 
 
 if(MYMODULE_IS_REMOTE)

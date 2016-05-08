@@ -1,6 +1,6 @@
 #include "wifistate.h"
 
-WifiState WifiStateUtils::StringToWifiState(const std::string& stateStr)
+WifiState::WifiState WifiStateUtils::StringToWifiState(const std::string& stateStr)
 {
   if (stateStr == "idle")
     return WifiState::Idle;
@@ -11,7 +11,7 @@ WifiState WifiStateUtils::StringToWifiState(const std::string& stateStr)
   return WifiState::Unknown;
 }
 
-std::string WifiStateUtils::WifiStateToString(const WifiState& state)
+std::string WifiStateUtils::WifiStateToString(const WifiState::WifiState& state)
 {
   switch(state)
   {

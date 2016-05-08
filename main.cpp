@@ -12,7 +12,7 @@
 #include "config.h"
 #include "globals.h"
 
-std::unique_ptr<Globs> _globs = std::unique_ptr<Globs>(new Globs);
+boost::shared_ptr<Globs> _globs = boost::shared_ptr<Globs>(new Globs);
 
 #ifdef MYMODULE_IS_REMOTE
 # define ALCALL

@@ -23,9 +23,9 @@ namespace AL
 }
 
 template <typename Proxy>
-std::shared_ptr<Proxy> InitProxy()
+boost::shared_ptr<Proxy> InitProxy()
 {
-  return std::shared_ptr<Proxy>(new Proxy(NAO_IP, NAO_PORT));
+  return boost::shared_ptr<Proxy>(new Proxy(NAO_IP, NAO_PORT));
 }
 
 WifiModule::WifiModule(boost::shared_ptr<AL::ALBroker> broker,
@@ -109,8 +109,8 @@ void WifiModule::OnFrontTactilTouched()
   _scrollPosUp = 0;
   if (_scrollPosDown == 1)
   {
-    for (auto& subscriber : _inputSubscribers)
-      subscriber->OnDown();
+    for (std::vector<IInputEventHandler*>::iterator it = _inputSubscribers.begin(); it != _inputSubscribers.end(); it++)
+      (*it)->OnDown();
   }
   _scrollPosDown = -1;
 }
@@ -133,8 +133,8 @@ void WifiModule::OnRearTactilTouched()
   _scrollPosDown = 0;
   if (_scrollPosUp == 1)
   {
-    for (auto& subscriber : _inputSubscribers)
-      subscriber->OnUp();
+    for (std::vector<IInputEventHandler*>::iterator it = _inputSubscribers.begin(); it != _inputSubscribers.end(); it++)
+      (*it)->OnUp();
   }
 
   _scrollPosUp = -1;
@@ -144,38 +144,38 @@ void WifiModule::OnChestSimpleClick()
 {
   std::cout << "You chest simple clicked me" << std::endl;
 
-  for (auto& subscriber : _inputSubscribers)
-    subscriber->OnEnter();
+  for (std::vector<IInputEventHandler*>::iterator it = _inputSubscribers.begin(); it != _inputSubscribers.end(); it++)
+    (*it)->OnEnter();
 }
 
 void WifiModule::OnChestTripleClick()
 {
   std::cout << "You chest triple clicked me" << std::endl;
 
-  for (auto& subscriber : _inputSubscribers)
-    subscriber->OnStart();
+  for (std::vector<IInputEventHandler*>::iterator it = _inputSubscribers.begin(); it != _inputSubscribers.end(); it++)
+    (*it)->OnStart();
 }
 
 void WifiModule::OnNetworkServiceInputRequired(const std::string& eventName, const AL::ALValue& inputRequest)
 {
   std::cout << "OnNetworkServiceInputRequired: " << inputRequest << std::endl;
 
-  for (auto& subscriber : _networkSubscribers)
-    subscriber->OnNetworkServiceInputRequired();
+  for (std::vector<INetworkEventHandler*>::iterator it = _networkSubscribers.begin(); it != _networkSubscribers.end(); it++)
+    (*it)->OnNetworkServiceInputRequired();
 }
 
 void WifiModule::OnNetworkConnectStatus(const std::string& eventName, const AL::ALValue& status)
 {
   std::cout << "OnNetworkConnectStatus: " << status << std::endl;
 
-  for (auto& subscriber : _networkSubscribers)
-    subscriber->OnNetworkConnectStatus(status[1].toString());
+  for (std::vector<INetworkEventHandler*>::iterator it = _networkSubscribers.begin(); it != _networkSubscribers.end(); it++)
+    (*it)->OnNetworkConnectStatus(status[1].toString());
 }
 
 void WifiModule::OnNetworkStatusChanged(const std::string& eventName, const AL::ALValue& status)
 {
   std::cout << "OnNetworkStatusChanged: " << status << std::endl;
 
-  for (auto& subscriber : _networkSubscribers)
-    subscriber->OnNetworkStatusChanged((std::string) status);
+  for (std::vector<INetworkEventHandler*>::iterator it = _networkSubscribers.begin(); it != _networkSubscribers.end(); it++)
+    (*it)->OnNetworkStatusChanged((std::string) status);
 }

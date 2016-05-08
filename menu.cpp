@@ -12,7 +12,7 @@ void Menu::ClearItems()
   _items.clear();
 }
 
-void Menu::AddItem(const std::shared_ptr<MenuItem>& item)
+void Menu::AddItem(const boost::shared_ptr<MenuItem>& item)
 {
   AL::Say(item->Name());
   _items.push_back(item);

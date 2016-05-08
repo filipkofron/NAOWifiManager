@@ -26,15 +26,15 @@
 
 struct Globs
 {
-  std::shared_ptr<ParamEntry> _glob_config;
+  boost::shared_ptr<ParamEntry> _glob_config;
   Menu _glob_menu;
   WifiManager _glob_WifiManager;
   MenuController _glob_GMenuController;
-  std::shared_ptr<AL::ALConnectionManagerProxy> _glob_connectionManagerProxy;
-  std::shared_ptr<AL::ALTextToSpeechProxy> _glob_textToSpeechProxy;
+  boost::shared_ptr<AL::ALConnectionManagerProxy> _glob_connectionManagerProxy;
+  boost::shared_ptr<AL::ALTextToSpeechProxy> _glob_textToSpeechProxy;
 };
 
-extern std::unique_ptr<Globs> _globs;
+extern boost::shared_ptr<Globs> _globs;
 
 inline ParamEntry& GetConfig() { return *_globs->_glob_config; }
 inline Menu& GetMenu() { return _globs->_glob_menu; }

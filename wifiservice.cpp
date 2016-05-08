@@ -3,21 +3,20 @@
 
 void WifiService::FindConfig()
 {
-  for (auto& wifi : GetConfig().Entries())
+  for (std::vector<boost::shared_ptr<ParamEntry> >::iterator wifi = GetConfig().Entries().begin(); wifi != GetConfig().Entries().end(); wifi++)
   {
-    if (wifi->Contains("section") && (*wifi)["section"] == "Wifi")
+    if ((*wifi)->Contains("section") && (**wifi)["section"] == "Wifi")
     {
-      for (auto& servicePtr : wifi->Entries())
+      for (std::vector<boost::shared_ptr<ParamEntry> >::iterator servicePtr = (*wifi)->Entries().begin(); servicePtr != (*wifi)->Entries().end(); servicePtr++)
       {
-        auto service = *servicePtr;
-        if (service.Contains("name") && service["name"] == _name)
+        if ((*servicePtr)->Contains("name") && (**servicePtr)["name"] == _name)
         {
-          auto config = std::shared_ptr<WifiConfig>(new WifiConfig);
-          config->_username = service["username"];
-          config->_password = service["password"];
+          boost::shared_ptr<WifiConfig> config = boost::shared_ptr<WifiConfig>(new WifiConfig);
+          config->_username = (**servicePtr)["username"];
+          config->_password = (**servicePtr)["password"];
           config->_enterprise = config->_password.length() > 0;
-          config->_passphrase = service["passphrase"];
-          config->_default = service["default"] == "true";
+          config->_passphrase = (**servicePtr)["passphrase"];
+          config->_default = (**servicePtr)["default"] == "true";
           _knownConfig = config;
           break;
         }

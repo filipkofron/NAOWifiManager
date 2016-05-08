@@ -4,7 +4,7 @@
 
 #define CHAR_READER_PATH "/etc/wifilist"
 
-CharReader::CharReader(const std::shared_ptr<std::ifstream>& file)
+CharReader::CharReader(const boost::shared_ptr<std::ifstream>& file)
   : _file(file)
 {
 }
@@ -93,12 +93,12 @@ std::string ParamEntry::operator [] (const std::string& name) const
   return ret;
 }
 
-std::shared_ptr<ParamEntry> ParamEntry::_root;
+boost::shared_ptr<ParamEntry> ParamEntry::_root;
 
 void ParamEntry::Reload()
 {
-  _globs->_glob_config = std::shared_ptr<ParamEntry>(new ParamEntry);
-  auto file = std::shared_ptr<std::ifstream>(new std::ifstream(CHAR_READER_PATH));
+  _globs->_glob_config = boost::shared_ptr<ParamEntry>(new ParamEntry);
+  boost::shared_ptr<std::ifstream> file = boost::shared_ptr<std::ifstream>(new std::ifstream(CHAR_READER_PATH));
   CharReader charReader(file);
   _globs->_glob_config->Load(charReader);
 }
@@ -143,7 +143,7 @@ bool ParamEntry::LoadEntry(CharReader& charReader)
 
 bool ParamEntry::LoadSubEntry(CharReader& charReader)
 {
-  auto entry = std::shared_ptr<ParamEntry>(new ParamEntry);
+  boost::shared_ptr<ParamEntry> entry = boost::shared_ptr<ParamEntry>(new ParamEntry);
   bool res = entry->Load(charReader);
   if (res)
     _entries.push_back(entry);
@@ -177,14 +177,14 @@ bool ParamEntry::Load(CharReader& charReader)
 
 void ParamEntry::PrintOn(std::ostream& os)
 {
-  for (auto& entry : _pairs)
+  for (std::map<std::string, std::string>::iterator it = _pairs.begin(); it != _pairs.end(); it++)
   {
-    std::cout << entry.first << ": " << entry.second << std::endl;
+    std::cout << it->first << ": " << it->second << std::endl;
   }
-  for (auto& sub : _entries)
+  for (std::vector<boost::shared_ptr<ParamEntry> >::iterator it = _entries.begin(); it != _entries.end(); it++)
   {
     std::cout << "{" << std::endl;
-    sub->PrintOn(os);
+    (*it)->PrintOn(os);
     std::cout << "}" << std::endl;
   }
 }

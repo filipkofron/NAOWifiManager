@@ -3,11 +3,11 @@
 #include "wifi.h"
 #include <iostream>
 
-std::shared_ptr<MenuItem> MakeItem(const std::string& name, IMenuHandler* handler)
+boost::shared_ptr<MenuItem> MakeItem(const std::string& name, IMenuHandler* handler)
 {
-  std::shared_ptr<MenuItem> menuItem(new MenuItem);
+  boost::shared_ptr<MenuItem> menuItem(new MenuItem);
   menuItem->Name() = name;
-  menuItem->Handler() = std::shared_ptr<IMenuHandler>(handler);
+  menuItem->Handler() = boost::shared_ptr<IMenuHandler>(handler);
   return menuItem;
 }
 
@@ -36,7 +36,7 @@ public:
   {
   }
 
-  virtual void Handle() override
+  virtual void Handle()
   {
     AL::Say("Zvolena síť " + _name);
     GetWifiManager().ChooseWifi(_name);
@@ -46,7 +46,7 @@ public:
 class EndChooseWifiMenuHandler : public IMenuHandler
 {
 public:
-  virtual void Handle() override
+  virtual void Handle()
   {
     GetMenu().ClearItems();
 
@@ -59,14 +59,14 @@ public:
 class ChooseWifiMenuEnterHandler : public IMenuHandler
 {
 public:
-  virtual void Handle() override
+  virtual void Handle()
   {
     GetMenu().ClearItems();
 
     GetWifiManager().UpdateList();
 
-    for (auto& service : GetWifiManager().Services())
-      GetMenu().AddItem(MakeItem(service.Name(), new ChooseWifiMenuHandler(service.Name())));
+    for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
+      GetMenu().AddItem(MakeItem(it->Name(), new ChooseWifiMenuHandler(it->Name())));
 
     GetMenu().AddItem(MakeItem("Ukončit vybráni wifi", new EndChooseWifiMenuHandler()));
   }
@@ -75,7 +75,7 @@ public:
 class EndMenuHandler : public IMenuHandler
 {
 public:
-  virtual void Handle() override
+  virtual void Handle()
   {
     GetMenu().ClearItems();
 

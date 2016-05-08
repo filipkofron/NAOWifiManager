@@ -12,7 +12,7 @@ public:
   {
 
   }
-  virtual std::string GetCommandString() override;
+  virtual std::string GetCommandString();
 };
 
 class WifiConnectToWPA : public ScriptCommand
@@ -26,7 +26,7 @@ public:
   {
 
   }
-  virtual std::string GetCommandString() override;
+  virtual std::string GetCommandString();
 };
 
 
@@ -42,5 +42,5 @@ public:
   {
 
   }
-  virtual std::string GetCommandString() override;
+  virtual std::string GetCommandString();
 };

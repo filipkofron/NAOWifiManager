@@ -1,7 +1,7 @@
 #pragma once
 
 #include "wifistate.h"
-#include <memory>
+#include <boost/shared_ptr.hpp>
 
 struct WifiConfig
 {
@@ -16,16 +16,16 @@ struct WifiService
 {
   std::string _name;
   std::string _id;
-  WifiState _state;
-  std::shared_ptr<WifiConfig> _knownConfig;
+  WifiState::WifiState _state;
+  boost::shared_ptr<WifiConfig> _knownConfig;
 
   void FindConfig();
 
   std::string& Name() { return _name; }
   std::string& Id() { return _id; }
-  WifiState& State() { return _state; }
+  WifiState::WifiState& State() { return _state; }
 
   const std::string& Name() const { return _name; }
   const std::string& Id() const { return _id; }
-  const WifiState& State() const { return _state; }
+  const WifiState::WifiState& State() const { return _state; }
 };
