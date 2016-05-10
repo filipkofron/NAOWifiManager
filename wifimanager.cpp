@@ -1,6 +1,7 @@
 #include "wifimanager.h"
 #include "globals.h"
 #include "wifi.h"
+#include "wifiscript.h"
 
 WifiManager::WifiManager()
 {
@@ -38,7 +39,7 @@ void WifiManager::Disconnect()
   if (IsConnectedToAny())
   {
     AL::Say("Odpojuji se");
-    //GetConnectionProxy().disconnect(GetConnectedToAnyId());
+    GetConnectionProxy().disconnect(GetConnectedToAnyId());
   }
 }
 
@@ -47,13 +48,43 @@ void WifiManager::Connect()
   if (IsSelectedNetworkAvailable())
   {
     AL::Say("Připojuji se k " + _selectedSSID);
-    GetConnectionProxy().connect(GetSelectedId());
+
+    boost::shared_ptr<WifiConfig> config;
+    for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
+    {
+      if (it->_name == _selectedSSID)
+        config = it->_knownConfig;
+    }
+    if (!config)
+      return;
+
+    boost::shared_ptr<ScriptCommand> wifi;
+
+    if (config->_enterprise)
+    {
+      wifi = boost::shared_ptr<ScriptCommand>(new WifiConnectToEnterprise(_selectedSSID, config->_username, config->_password));
+    }
+    else if (config->_passphrase.empty())
+    {
+      wifi = boost::shared_ptr<ScriptCommand>(new WifiConnectToOpen(_selectedSSID));
+    }
+    else
+    {
+      wifi = boost::shared_ptr<ScriptCommand>(new WifiConnectToWPA(_selectedSSID, config->_passphrase));
+    }
+
+    std::string output;
+    wifi->Execute(output);
+    std::cout << "ScriptCommand to connect to wifi, output: '" << output << "'" << std::endl;
+
+
+    //GetConnectionProxy().connect(GetSelectedId());
   }
 }
 
 void WifiManager::OnNetworkServiceInputRequired()
 {
-  boost::shared_ptr<WifiConfig> config;
+  /*boost::shared_ptr<WifiConfig> config;
   for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
   {
     if (it->_name == _selectedSSID)
@@ -72,11 +103,6 @@ void WifiManager::OnNetworkServiceInputRequired()
     identity.arraySetSize(2);
     identity[0] = "Identity";
     identity[1] = config->_username;
-
-    /*AL::ALValue user;
-    user.arraySetSize(2);
-    user[0] = "Username";
-    user[1] = config->_username;*/
 
     AL::ALValue pass;
     pass.arraySetSize(2);
@@ -102,15 +128,19 @@ void WifiManager::OnNetworkServiceInputRequired()
 
   std::cout << "Setting requested input to: " << input << std::endl;
 
-  GetConnectionProxy().setServiceInput(input);
+  GetConnectionProxy().setServiceInput(input);*/
 }
 
 void WifiManager::UpdateList()
 {
   std::string serviceOff;
   std::string serviceOn;
+#if !LOCAL_TEST
   GetConnectionProxy().scan();
   AL::ALValue serviceList = GetConnectionProxy().services();
+#else // !LOCAL_TEST
+  AL::ALValue serviceList;
+#endif // !LOCAL_TEST
   _services.clear();
   for (int i = 0; i < serviceList.getSize(); i++)
   {
@@ -142,6 +172,21 @@ void WifiManager::UpdateList()
     if (service._knownConfig && service._knownConfig->_default && _selectedSSID.empty())
       _selectedSSID = service._name;
   }
+
+#if LOCAL_TEST
+
+
+  WifiService service;
+  service._id = "whatever";
+  service._name = "YETTI";
+  service._state = WifiStateUtils::StringToWifiState("Idle");
+  service.FindConfig();
+  _services.push_back(service);
+
+  if (service._knownConfig && service._knownConfig->_default && _selectedSSID.empty())
+    _selectedSSID = service._name;
+
+#endif // LOCAL_TEST
 }
 
 bool WifiManager::IsSelectedNetworkAvailable() const

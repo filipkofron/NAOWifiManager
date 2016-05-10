@@ -33,7 +33,9 @@ WifiModule::WifiModule(boost::shared_ptr<AL::ALBroker> broker,
   : AL::ALModule(broker, name),
     _memoryProxy(NAO_IP, NAO_PORT)
 {
+#if !LOCAL_TEST
   _globs->_glob_connectionManagerProxy = InitProxy<AL::ALConnectionManagerProxy>();
+#endif // !LOCAL_TEST
   _globs->_glob_textToSpeechProxy = InitProxy<AL::ALTextToSpeechProxy>();
   // Describe the module here. This will appear on the webpage
   setModuleDescription("My own custom module.");
