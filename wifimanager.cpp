@@ -39,7 +39,7 @@ void WifiManager::Disconnect()
   if (IsConnectedToAny())
   {
     AL::Say("Odpojuji se");
-    GetConnectionProxy().disconnect(GetConnectedToAnyId());
+    // GetConnectionProxy().disconnect(GetConnectedToAnyId());
   }
 }
 
@@ -76,75 +76,31 @@ void WifiManager::Connect()
     std::string output;
     wifi->Execute(output);
     std::cout << "ScriptCommand to connect to wifi, output: '" << output << "'" << std::endl;
-
-
-    //GetConnectionProxy().connect(GetSelectedId());
   }
 }
 
 void WifiManager::OnNetworkServiceInputRequired()
 {
-  /*boost::shared_ptr<WifiConfig> config;
-  for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
-  {
-    if (it->_name == _selectedSSID)
-      config = it->_knownConfig;
-  }
-  if (!config)
-    return;
-
-  AL::ALValue input;
-
-  if (config->_enterprise)
-  {
-    input.arraySetSize(2);
-
-    AL::ALValue identity;
-    identity.arraySetSize(2);
-    identity[0] = "Identity";
-    identity[1] = config->_username;
-
-    AL::ALValue pass;
-    pass.arraySetSize(2);
-    pass[0] = "Password";
-    pass[1] = config->_password;
-
-    input[0] = identity;
-    input[1] = pass;
-
-    //input[0] = user;
-    //input[1] = identity;
-    //input[2] = pass;
-  }
-  else
-  {
-    input.arraySetSize(1);
-    AL::ALValue pass;
-    pass.arraySetSize(2);
-    pass[0] = "Passphrase";
-    pass[1] = config->_passphrase;
-    input[0] = pass;
-  }
-
-  std::cout << "Setting requested input to: " << input << std::endl;
-
-  GetConnectionProxy().setServiceInput(input);*/
 }
 
 void WifiManager::UpdateList()
 {
+  // reload config
+  ParamEntry::Reload();
+
   std::string serviceOff;
   std::string serviceOn;
-#if !LOCAL_TEST
+#if !WIFI_LOCAL_TEST
   GetConnectionProxy().scan();
   AL::ALValue serviceList = GetConnectionProxy().services();
+  // std::cout << serviceList << std::endl;
 #else // !LOCAL_TEST
   AL::ALValue serviceList;
 #endif // !LOCAL_TEST
   _services.clear();
   for (int i = 0; i < serviceList.getSize(); i++)
   {
-    //std::cout << "item[" << i << "]: " << serviceList[i] << std::endl;
+    // std::cout << "item[" << i << "]: " << serviceList[i] << std::endl;
     std::map<std::string, std::string> details;
     for (int j = 0; j < serviceList[i].getSize(); j++)
     {
@@ -173,7 +129,7 @@ void WifiManager::UpdateList()
       _selectedSSID = service._name;
   }
 
-#if LOCAL_TEST
+#if WIFI_LOCAL_TEST
 
 
   WifiService service;
@@ -186,7 +142,7 @@ void WifiManager::UpdateList()
   if (service._knownConfig && service._knownConfig->_default && _selectedSSID.empty())
     _selectedSSID = service._name;
 
-#endif // LOCAL_TEST
+#endif // WIFI_LOCAL_TEST
 }
 
 bool WifiManager::IsSelectedNetworkAvailable() const
@@ -203,7 +159,7 @@ bool WifiManager::IsConnectedToSelected() const
 {
   for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
   {
-    if (it->_name == _selectedSSID && (it->_state == WifiState::Online || it->_state == WifiState::Idle))
+    if (it->_name == _selectedSSID && (it->_state == WifiState::Online))
       return true;
   }
   return false;
@@ -214,7 +170,7 @@ bool WifiManager::IsConnectedToAny() const
 {
   for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
   {
-    if (it->_state == WifiState::Online || it->_state == WifiState::Idle)
+    if (it->_state == WifiState::Online)
       return true;
   }
   return false;

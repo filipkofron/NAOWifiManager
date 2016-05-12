@@ -9,7 +9,7 @@ namespace AL
 {
   void Say(const std::string& message)
   {
-#if LOCAL_TEST && 1
+#if LOCAL_TEST || 1
     std::cout << "Would say: " << message << std::endl;
 #else // LOCAL_TEST
     std::cout << "Would say: " << message << std::endl;
@@ -19,6 +19,13 @@ namespace AL
 
 
     // std::cout << GetTextToSpeechProxy().getAvailableLanguages() << std::endl;
+  }
+
+  void SayEverytime(const std::string& message)
+  {
+    std::cout << "Would say: " << message << std::endl;
+    GetTextToSpeechProxy().setLanguage("Czech");
+    GetTextToSpeechProxy().say(message);
   }
 }
 
@@ -31,9 +38,11 @@ boost::shared_ptr<Proxy> InitProxy()
 WifiModule::WifiModule(boost::shared_ptr<AL::ALBroker> broker,
                    const std::string& name)
   : AL::ALModule(broker, name),
-    _memoryProxy(NAO_IP, NAO_PORT)
+    _memoryProxy(NAO_IP, NAO_PORT),
+    _ending(false),
+    _updateThread(&WifiModule::UpdateThread, this)
 {
-#if !LOCAL_TEST
+#if !WIFI_LOCAL_TEST
   _globs->_glob_connectionManagerProxy = InitProxy<AL::ALConnectionManagerProxy>();
 #endif // !LOCAL_TEST
   _globs->_glob_textToSpeechProxy = InitProxy<AL::ALTextToSpeechProxy>();
@@ -62,6 +71,8 @@ WifiModule::WifiModule(boost::shared_ptr<AL::ALBroker> broker,
 
 WifiModule::~WifiModule()
 {
+  _ending = true;
+  _updateThread.join();
 }
 
 void WifiModule::init()
@@ -86,27 +97,61 @@ void WifiModule::init()
   _memoryProxy.subscribeToEvent("NetworkServiceStateChanged", "WifiModule", "OnNetworkStatusChanged");
 
   // THIS MUST BE ENABLED
-  // OnNetworkConnectStatus(AL::ALValue());
+  AL::ALValue status = "test";
+  /*status.arraySetSize(2);
+  status[1] = "idle";*/
+  OnNetworkStatusChanged(AL::ALValue(), status);
 
+  //TODO: REMOVE
+
+  // OnChestTripleClick();
+  // OnChestSimpleClick();
+/*
+  for (int i = 0; i < GetWifiManager().Services().size(); i++)
+  {
+    if (GetWifiManager().Services()[i].Name() == "eduroam")
+      break;
+    OnRearTactilTouched();
+    OnMiddleTactilTouched();
+    OnFrontTactilTouched();
+  }
+
+  OnChestSimpleClick();*/
+
+#if LOCAL_TEST
   OnChestTripleClick();
   OnChestSimpleClick();
 
- /* OnRearTactilTouched();
-  OnMiddleTactilTouched();
-  OnFrontTactilTouched();
-
-  OnRearTactilTouched();
-  OnMiddleTactilTouched();
-  OnFrontTactilTouched();*/
+  for (int i = 0; i < 2; i++)
+  {
+    OnRearTactilTouched();
+    OnMiddleTactilTouched();
+    OnFrontTactilTouched();
+  }
 
   OnChestSimpleClick();
 
   //OnChestSimpleClick();
+#endif // LOCAL_TEST
+}
+
+void WifiModule::UpdateSleep()
+{
+  boost::this_thread::sleep_for(boost::chrono::seconds(15));
+}
+
+void WifiModule::UpdateThread()
+{
+  while (!_ending)
+  {
+    UpdateSleep();
+    OnNetworkStatusChanged(AL::ALValue(), "");
+  }
 }
 
 void WifiModule::OnFrontTactilTouched()
 {
-  std::cout << "You touched meeah on front" << std::endl;
+  // std::cout << "You touched meeah on front" << std::endl;
 
   _scrollPosUp = 0;
   if (_scrollPosDown == 1)
@@ -119,7 +164,7 @@ void WifiModule::OnFrontTactilTouched()
 
 void WifiModule::OnMiddleTactilTouched()
 {
-  std::cout << "You touched meeah on center" << std::endl;
+  // std::cout << "You touched meeah on center" << std::endl;
 
   if (_scrollPosDown == 0)
     _scrollPosDown = 1;
@@ -130,7 +175,7 @@ void WifiModule::OnMiddleTactilTouched()
 
 void WifiModule::OnRearTactilTouched()
 {
-  std::cout << "You touched meeah on rear" << std::endl;
+  // std::cout << "You touched meeah on rear" << std::endl;
 
   _scrollPosDown = 0;
   if (_scrollPosUp == 1)
@@ -144,7 +189,7 @@ void WifiModule::OnRearTactilTouched()
 
 void WifiModule::OnChestSimpleClick()
 {
-  std::cout << "You chest simple clicked me" << std::endl;
+  // std::cout << "You chest simple clicked me" << std::endl;
 
   for (std::vector<IInputEventHandler*>::iterator it = _inputSubscribers.begin(); it != _inputSubscribers.end(); it++)
     (*it)->OnEnter();
@@ -152,7 +197,7 @@ void WifiModule::OnChestSimpleClick()
 
 void WifiModule::OnChestTripleClick()
 {
-  std::cout << "You chest triple clicked me" << std::endl;
+  // std::cout << "You chest triple clicked me" << std::endl;
 
   for (std::vector<IInputEventHandler*>::iterator it = _inputSubscribers.begin(); it != _inputSubscribers.end(); it++)
     (*it)->OnStart();
@@ -160,7 +205,7 @@ void WifiModule::OnChestTripleClick()
 
 void WifiModule::OnNetworkServiceInputRequired(const std::string& eventName, const AL::ALValue& inputRequest)
 {
-  std::cout << "OnNetworkServiceInputRequired: " << inputRequest << std::endl;
+  // std::cout << "OnNetworkServiceInputRequired: " << inputRequest << std::endl;
 
   for (std::vector<INetworkEventHandler*>::iterator it = _networkSubscribers.begin(); it != _networkSubscribers.end(); it++)
     (*it)->OnNetworkServiceInputRequired();
@@ -168,7 +213,7 @@ void WifiModule::OnNetworkServiceInputRequired(const std::string& eventName, con
 
 void WifiModule::OnNetworkConnectStatus(const std::string& eventName, const AL::ALValue& status)
 {
-  std::cout << "OnNetworkConnectStatus: " << status << std::endl;
+  // std::cout << "OnNetworkConnectStatus: " << status << std::endl;
 
   for (std::vector<INetworkEventHandler*>::iterator it = _networkSubscribers.begin(); it != _networkSubscribers.end(); it++)
     (*it)->OnNetworkConnectStatus(status[1].toString());
@@ -176,7 +221,7 @@ void WifiModule::OnNetworkConnectStatus(const std::string& eventName, const AL::
 
 void WifiModule::OnNetworkStatusChanged(const std::string& eventName, const AL::ALValue& status)
 {
-  std::cout << "OnNetworkStatusChanged: " << status << std::endl;
+ // std::cout << "OnNetworkStatusChanged: " << status << std::endl;
 
   for (std::vector<INetworkEventHandler*>::iterator it = _networkSubscribers.begin(); it != _networkSubscribers.end(); it++)
     (*it)->OnNetworkStatusChanged((std::string) status);

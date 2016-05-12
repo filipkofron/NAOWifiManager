@@ -10,20 +10,27 @@
 
 #ifdef MYMODULE_IS_REMOTE
   // #define NAO_IP "127.0.0.1"
-  // #define NAO_IP "10.10.48.252"
+  #define NAO_IP "10.10.48.252"
   // #define NAO_IP "192.168.0.100"
   // #define NAO_IP "192.168.0.114"
-  #define NAO_IP "192.168.1.147"
+  // #define NAO_IP "192.168.1.147"
   #define NAO_PORT 9559
 #else // MYMODULE_IS_REMOTE
   #define NAO_IP "127.0.0.1"
   #define NAO_PORT 9559
 #endif // MYMODULE_IS_REMOTE
 
-#define LOCAL_TEST_ENABLE 1
+#define LOCAL_TEST_ENABLE 0
 #if LOCAL_TEST_ENABLE && defined(MYMODULE_IS_REMOTE)
   #define LOCAL_TEST 1
 #endif
+
+#if LOCAL_TEST
+// #define WIFI_LOCAL_TEST 1
+#else
+#define WIFI_LOCAL_TEST 0
+#endif
+
 
 struct Globs
 {

@@ -24,6 +24,7 @@ public:
   virtual void OnNetworkServiceInputRequired();
   void UpdateList();
 
+  const std::string& SelectedSSID() const { return _selectedSSID; }
   const std::vector<WifiService>& Services() { return _services; }
 
   void ChooseWifi(const std::string& name);

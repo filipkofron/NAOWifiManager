@@ -12,6 +12,7 @@ namespace AL
   // avoids including <alcommon/albroker.h> in this header
   class ALBroker;
   void Say(const std::string& message);
+  void SayEverytime(const std::string& message);
 }
 
 /**
@@ -23,9 +24,14 @@ class WifiModule : public AL::ALModule
 protected:
   int _scrollPosUp;
   int _scrollPosDown;
+  bool _ending;
+  boost::thread _updateThread;
   AL::ALMemoryProxy _memoryProxy;
   std::vector<IInputEventHandler*> _inputSubscribers;
   std::vector<INetworkEventHandler*> _networkSubscribers;
+
+  void UpdateSleep();
+  void UpdateThread();
 public:
   WifiModule(boost::shared_ptr<AL::ALBroker> broker,
            const std::string &name);
