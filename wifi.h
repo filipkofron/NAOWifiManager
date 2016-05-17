@@ -6,6 +6,7 @@
 #include <alproxies/almemoryproxy.h>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include "globals.h"
 #include "wifimanager.h"
 
 namespace AL
@@ -29,8 +30,9 @@ protected:
   bool _ending;
   boost::thread _updateThread;
   boost::mutex _updateMutex;
-
+#if !LOCAL_TEST
   AL::ALMemoryProxy _memoryProxy;
+#endif // LOCAL_TEST
   std::vector<IInputEventHandler*> _inputSubscribers;
   std::vector<INetworkEventHandler*> _networkSubscribers;
 

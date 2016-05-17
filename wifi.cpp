@@ -10,20 +10,20 @@ namespace AL
   void Say(const std::string& message)
   {
 #if LOCAL_TEST || 1
-    std::cout << "Would say: " << message << std::endl;
+    Log() << "Would say: " << message << std::endl;
 #else // LOCAL_TEST
-    std::cout << "Would say: " << message << std::endl;
+    Log() << "Would say: " << message << std::endl;
     GetTextToSpeechProxy().setLanguage("Czech");
     GetTextToSpeechProxy().say(message);
 #endif // LOCAL_TEST
 
 
-    // std::cout << GetTextToSpeechProxy().getAvailableLanguages() << std::endl;
+    // Log() << GetTextToSpeechProxy().getAvailableLanguages() << std::endl;
   }
 
   void SayEverytime(const std::string& message)
   {
-    std::cout << "Would say: " << message << std::endl;
+    Log() << "Would say: " << message << std::endl;
     GetTextToSpeechProxy().setLanguage("Czech");
     GetTextToSpeechProxy().say(message);
   }
@@ -32,16 +32,28 @@ namespace AL
 template <typename Proxy>
 boost::shared_ptr<Proxy> InitProxy()
 {
+#if LOCAL_TEST
+  return boost::shared_ptr<Proxy>();
+#else // LOCAL_TEST
   return boost::shared_ptr<Proxy>(new Proxy(NAO_IP, NAO_PORT));
+#endif // LOCAL_TEST
 }
 
 WifiModule::WifiModule(boost::shared_ptr<AL::ALBroker> broker,
                    const std::string& name)
   : AL::ALModule(broker, name),
+#if !LOCAL_TEST
     _memoryProxy(NAO_IP, NAO_PORT),
+#endif // LOCAL_TEST
     _ending(false),
     _updateThread(&WifiModule::UpdateThread, this)
 {
+  ParamEntry::Reload();
+#if LOCAL_TEST
+  Log() << "Config:" << std::endl;
+  GetConfig().PrintOn(Log());
+#endif // LOCAL_TEST
+
 #if !WIFI_LOCAL_TEST
   _globs->_glob_connectionManagerProxy = InitProxy<AL::ALConnectionManagerProxy>();
 #endif // !LOCAL_TEST
@@ -84,9 +96,10 @@ void WifiModule::init()
    * Init is called just after construction.
    * Do something or not
    */
-  //std::cout << returnTrue() << std::endl;
-  std::cout << "Wifi module initializing.." << std::endl;
+  //Log() << returnTrue() << std::endl;
+  Log() << "Wifi module initializing.." << std::endl;
   ParamEntry::Reload();
+#if !LOCAL_TEST
   _memoryProxy.subscribeToEvent("FrontTactilTouched", "WifiModule", "OnFrontTactilTouched");
   _memoryProxy.subscribeToEvent("MiddleTactilTouched", "WifiModule", "OnMiddleTactilTouched");
   _memoryProxy.subscribeToEvent("RearTactilTouched", "WifiModule", "OnRearTactilTouched");
@@ -95,6 +108,7 @@ void WifiModule::init()
   _memoryProxy.subscribeToEvent("NetworkServiceInputRequired", "WifiModule", "OnNetworkServiceInputRequired");
   _memoryProxy.subscribeToEvent("NetworkConnectStatus", "WifiModule", "OnNetworkConnectStatus");
   _memoryProxy.subscribeToEvent("NetworkServiceStateChanged", "WifiModule", "OnNetworkStatusChanged");
+#endif // LOCAL_TEST
 
   // THIS MUST BE ENABLED
   AL::ALValue status = "test";
@@ -151,7 +165,7 @@ void WifiModule::UpdateThread()
 
 void WifiModule::OnFrontTactilTouched()
 {
-  // std::cout << "You touched meeah on front" << std::endl;
+  // Log() << "You touched meeah on front" << std::endl;
 
   boost::mutex::scoped_lock lock(_updateMutex);
 
@@ -166,7 +180,7 @@ void WifiModule::OnFrontTactilTouched()
 
 void WifiModule::OnMiddleTactilTouched()
 {
-  // std::cout << "You touched meeah on center" << std::endl;
+  // Log() << "You touched meeah on center" << std::endl;
 
   boost::mutex::scoped_lock lock(_updateMutex);
 
@@ -179,7 +193,7 @@ void WifiModule::OnMiddleTactilTouched()
 
 void WifiModule::OnRearTactilTouched()
 {
-  // std::cout << "You touched meeah on rear" << std::endl;
+  // Log() << "You touched meeah on rear" << std::endl;
 
   boost::mutex::scoped_lock lock(_updateMutex);
 
@@ -195,7 +209,7 @@ void WifiModule::OnRearTactilTouched()
 
 void WifiModule::OnChestSimpleClick()
 {
-  // std::cout << "You chest simple clicked me" << std::endl;
+  // Log() << "You chest simple clicked me" << std::endl;
 
   boost::mutex::scoped_lock lock(_updateMutex);
 
@@ -205,9 +219,11 @@ void WifiModule::OnChestSimpleClick()
 
 void WifiModule::OnChestTripleClick()
 {
-  // std::cout << "You chest triple clicked me" << std::endl;
+  // Log() << "You chest triple clicked me" << std::endl;
 
   boost::mutex::scoped_lock lock(_updateMutex);
+
+  ParamEntry::Reload();
 
   for (std::vector<IInputEventHandler*>::iterator it = _inputSubscribers.begin(); it != _inputSubscribers.end(); it++)
     (*it)->OnStart();
@@ -215,7 +231,7 @@ void WifiModule::OnChestTripleClick()
 
 void WifiModule::OnNetworkServiceInputRequired(const std::string& eventName, const AL::ALValue& inputRequest)
 {
-  // std::cout << "OnNetworkServiceInputRequired: " << inputRequest << std::endl;
+  // Log() << "OnNetworkServiceInputRequired: " << inputRequest << std::endl;
 
   boost::mutex::scoped_lock lock(_updateMutex);
 
@@ -225,7 +241,7 @@ void WifiModule::OnNetworkServiceInputRequired(const std::string& eventName, con
 
 void WifiModule::OnNetworkConnectStatus(const std::string& eventName, const AL::ALValue& status)
 {
-  // std::cout << "OnNetworkConnectStatus: " << status << std::endl;
+  // Log() << "OnNetworkConnectStatus: " << status << std::endl;
 
   boost::mutex::scoped_lock lock(_updateMutex);
 
@@ -235,7 +251,7 @@ void WifiModule::OnNetworkConnectStatus(const std::string& eventName, const AL::
 
 void WifiModule::OnNetworkStatusChanged(const std::string& eventName, const AL::ALValue& status)
 {
- // std::cout << "OnNetworkStatusChanged: " << status << std::endl;
+ // Log() << "OnNetworkStatusChanged: " << status << std::endl;
 
   boost::mutex::scoped_lock lock(_updateMutex);
 

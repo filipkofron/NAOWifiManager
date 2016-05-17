@@ -48,9 +48,16 @@ extern "C"
 #ifdef MYMODULE_IS_REMOTE
 int main()
 {
-  ParamEntry::Reload();
-  std::cout << "Config:" << std::endl;
-  GetConfig().PrintOn(std::cout);
+#if LOCAL_TEST
+  WifiModule wifi(boost::shared_ptr<AL::ALBroker>(), "WifiModule");
+  wifi.init();
+  int sleep = 60;
+  for (int i = 0; i < sleep; i++)
+  {
+    Log() << "will sleep for: " << (sleep - i) << " seconds." << std::endl;
+    qi::os::sleep(1);
+  }
+#else // LOCAL_TEST
   int pport = NAO_PORT;
   std::string pip = NAO_IP;
 
@@ -104,9 +111,10 @@ int main()
 
   for (int i = 0; i < 60; i++)
   {
-    std::cout << "will sleep for: " << (20 - i) << " seconds." << std::endl;
+    Log() << "will sleep for: " << (20 - i) << " seconds." << std::endl;
     qi::os::sleep(1);
   }
+#endif // LOCAL_TEST
   return 0;
 }
 #endif

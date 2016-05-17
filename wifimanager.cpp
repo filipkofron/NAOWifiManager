@@ -4,12 +4,14 @@
 #include "wifiscript.h"
 
 WifiManager::WifiManager()
+  : _wasConnecting(false), _disabled(false)
 {
 }
 
 void WifiManager::ChooseWifi(const std::string& name)
 {
   _selectedSSID = name;
+  _disabled = false;
   Disconnect();
   Connect();
 }
@@ -41,6 +43,12 @@ void WifiManager::Disconnect()
     AL::Say("Odpojuji se");
     // GetConnectionProxy().disconnect(GetConnectedToAnyId());
   }
+  for (int i = 0; i < _networkCleanups.size(); i++)
+  {
+    std::string temp;
+    _networkCleanups[i]->Execute(temp);
+  }
+  _networkCleanups.clear();
 }
 
 void WifiManager::Connect()
@@ -48,6 +56,7 @@ void WifiManager::Connect()
   if (IsSelectedNetworkAvailable())
   {
     AL::Say("Připojuji se k " + _selectedSSID);
+    _wasConnecting = true;
 
     boost::shared_ptr<WifiConfig> config;
     for (std::vector<WifiService>::const_iterator it = GetWifiManager().Services().begin(); it != GetWifiManager().Services().end(); it++)
@@ -75,7 +84,7 @@ void WifiManager::Connect()
 
     std::string output;
     wifi->Execute(output);
-    std::cout << "ScriptCommand to connect to wifi, output: '" << output << "'" << std::endl;
+    Log() << "ScriptCommand to connect to wifi, output: '" << output << "'" << std::endl;
   }
 }
 
@@ -93,18 +102,18 @@ void WifiManager::UpdateList()
 #if !WIFI_LOCAL_TEST
   GetConnectionProxy().scan();
   AL::ALValue serviceList = GetConnectionProxy().services();
-  // std::cout << serviceList << std::endl;
+  // Log() << serviceList << std::endl;
 #else // !LOCAL_TEST
   AL::ALValue serviceList;
 #endif // !LOCAL_TEST
   _services.clear();
   for (int i = 0; i < serviceList.getSize(); i++)
   {
-    // std::cout << "item[" << i << "]: " << serviceList[i] << std::endl;
+    // Log() << "item[" << i << "]: " << serviceList[i] << std::endl;
     std::map<std::string, std::string> details;
     for (int j = 0; j < serviceList[i].getSize(); j++)
     {
-      //std::cout << " -- " << serviceList[i][j] << std::endl;
+      //Log() << " -- " << serviceList[i][j] << std::endl;
       std::string name = serviceList[i][j][0];
       std::string val;
       if (serviceList[i][j][1].isString())
@@ -115,7 +124,7 @@ void WifiManager::UpdateList()
     }
     /*for (auto& item : details)
     {
-      std::cout << item.first << ": " << item.second << std::endl;
+      Log() << item.first << ": " << item.second << std::endl;
     }*/
 
     WifiService service;
@@ -186,14 +195,42 @@ void WifiManager::OnNetworkConnectStatus(const std::string& status)
 
 void WifiManager::OnNetworkStatusChanged(const std::string& status)
 {
+  if (IsDisabled())
+    return;
+
   UpdateList();
 
   if (!IsConnectedToSelected())
   {
+    if (_wasConnecting)
+    {
+      AL::Say("Připojení k " + _selectedSSID + " selhalo");
+      _wasConnecting = false;
+    }
     if (IsSelectedNetworkAvailable())
     {
       Disconnect();
       Connect();
     }
   }
+  else
+  {
+    AL::Say("Připojen k " + _selectedSSID);
+    _wasConnecting = false;
+  }
+}
+
+void WifiManager::SetDisabled(bool disabled)
+{
+  if (disabled)
+  {
+    if (IsConnectedToAny())
+      Disconnect();
+  }
+  else
+  {
+    if (IsSelectedNetworkAvailable())
+      Connect();
+  }
+  _disabled = disabled;
 }

@@ -179,12 +179,12 @@ void ParamEntry::PrintOn(std::ostream& os)
 {
   for (std::map<std::string, std::string>::iterator it = _pairs.begin(); it != _pairs.end(); it++)
   {
-    std::cout << it->first << ": " << it->second << std::endl;
+    Log() << it->first << ": " << it->second << std::endl;
   }
   for (std::vector<boost::shared_ptr<ParamEntry> >::iterator it = _entries.begin(); it != _entries.end(); it++)
   {
-    std::cout << "{" << std::endl;
+    Log() << "{" << std::endl;
     (*it)->PrintOn(os);
-    std::cout << "}" << std::endl;
+    Log() << "}" << std::endl;
   }
 }

@@ -7,6 +7,7 @@
 #define BOOST_SIGNALS_NO_DEPRECATION_WARNING
 #include <alproxies/alconnectionmanagerproxy.h>
 #include <alproxies/altexttospeechproxy.h>
+#include <sstream>
 
 #ifdef MYMODULE_IS_REMOTE
   // #define NAO_IP "127.0.0.1"
@@ -26,11 +27,12 @@
 #endif
 
 #if LOCAL_TEST
-// #define WIFI_LOCAL_TEST 1
+ #define WIFI_LOCAL_TEST 1
 #else
 #define WIFI_LOCAL_TEST 0
 #endif
 
+#include "log.h"
 
 struct Globs
 {
@@ -41,6 +43,9 @@ struct Globs
   boost::shared_ptr<AL::ALConnectionManagerProxy> _glob_connectionManagerProxy;
   boost::shared_ptr<AL::ALTextToSpeechProxy> _glob_textToSpeechProxy;
 };
+
+#if !LOCAL_TEST
+#endif // LOCAL_TEST
 
 extern boost::shared_ptr<Globs> _globs;
 

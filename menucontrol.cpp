@@ -72,6 +72,25 @@ public:
   }
 };
 
+class DisableWifi : public IMenuHandler
+{
+public:
+  virtual void Handle()
+  {
+    GetWifiManager().SetDisabled(true);
+  }
+};
+
+class EnableWifi : public IMenuHandler
+{
+public:
+  virtual void Handle()
+  {
+    GetWifiManager().SetDisabled(false);
+    GetMenuController().OnStart();
+  }
+};
+
 class EndMenuHandler : public IMenuHandler
 {
 public:
@@ -88,5 +107,9 @@ void MenuController::OnStart()
   GetMenu().ClearItems();
 
   GetMenu().AddItem(MakeItem("Zvolte síť", new ChooseWifiMenuEnterHandler));
+  if (GetWifiManager().IsDisabled())
+    GetMenu().AddItem(MakeItem("Zapnout síť", new EnableWifi));
+  else
+    GetMenu().AddItem(MakeItem("Vypnout síť", new DisableWifi));
   GetMenu().AddItem(MakeItem("Ukončit nastavení sítě", new EndMenuHandler));
 }

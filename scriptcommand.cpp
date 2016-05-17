@@ -1,4 +1,5 @@
 #include "scriptcommand.h"
+#include "log.h"
 #include <boost/shared_ptr.hpp>
 #include <cstdio>
 #include <memory>
@@ -7,7 +8,7 @@
 bool ScriptCommand::Execute(std::string& out)
 {
   std::string command = GetCommandString();
-  std::cout << "Executing: '" << command << std::endl;
+  Log() << "Executing: '" << command << std::endl;
   boost::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
 
   if (!pipe)

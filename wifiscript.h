@@ -2,7 +2,30 @@
 
 #include "scriptcommand.h"
 
-class WifiConnectToOpen : public ScriptCommand
+class WifiRemoveNetwork : public ScriptCommand
+{
+private:
+  std::string _netId;
+public:
+  WifiRemoveNetwork(const std::string& netId)
+    : _netId(netId)
+  {
+
+  }
+  virtual std::string GetCommandString();
+};
+
+class WifiNetworkAdder : public ScriptCommand
+{
+protected:
+  std::string _netId;
+public:
+  virtual void OnOutput(const std::string& out);
+  std::string GetNetworkId() { return _netId; }
+};
+
+
+class WifiConnectToOpen : public WifiNetworkAdder
 {
 private:
   std::string _ssid;
@@ -15,7 +38,7 @@ public:
   virtual std::string GetCommandString();
 };
 
-class WifiConnectToWPA : public ScriptCommand
+class WifiConnectToWPA : public WifiNetworkAdder
 {
 private:
   std::string _ssid;
@@ -30,7 +53,7 @@ public:
 };
 
 
-class WifiConnectToEnterprise : public ScriptCommand
+class WifiConnectToEnterprise : public WifiNetworkAdder
 {
 private:
   std::string _ssid;
