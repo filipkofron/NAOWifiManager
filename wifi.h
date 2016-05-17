@@ -4,6 +4,8 @@
 #include <alcommon/almodule.h>
 #include <alproxies/alconnectionmanagerproxy.h>
 #include <alproxies/almemoryproxy.h>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
 #include "wifimanager.h"
 
 namespace AL
@@ -26,6 +28,8 @@ protected:
   int _scrollPosDown;
   bool _ending;
   boost::thread _updateThread;
+  boost::mutex _updateMutex;
+
   AL::ALMemoryProxy _memoryProxy;
   std::vector<IInputEventHandler*> _inputSubscribers;
   std::vector<INetworkEventHandler*> _networkSubscribers;

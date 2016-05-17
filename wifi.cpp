@@ -153,6 +153,8 @@ void WifiModule::OnFrontTactilTouched()
 {
   // std::cout << "You touched meeah on front" << std::endl;
 
+  boost::mutex::scoped_lock lock(_updateMutex);
+
   _scrollPosUp = 0;
   if (_scrollPosDown == 1)
   {
@@ -166,6 +168,8 @@ void WifiModule::OnMiddleTactilTouched()
 {
   // std::cout << "You touched meeah on center" << std::endl;
 
+  boost::mutex::scoped_lock lock(_updateMutex);
+
   if (_scrollPosDown == 0)
     _scrollPosDown = 1;
 
@@ -176,6 +180,8 @@ void WifiModule::OnMiddleTactilTouched()
 void WifiModule::OnRearTactilTouched()
 {
   // std::cout << "You touched meeah on rear" << std::endl;
+
+  boost::mutex::scoped_lock lock(_updateMutex);
 
   _scrollPosDown = 0;
   if (_scrollPosUp == 1)
@@ -191,6 +197,8 @@ void WifiModule::OnChestSimpleClick()
 {
   // std::cout << "You chest simple clicked me" << std::endl;
 
+  boost::mutex::scoped_lock lock(_updateMutex);
+
   for (std::vector<IInputEventHandler*>::iterator it = _inputSubscribers.begin(); it != _inputSubscribers.end(); it++)
     (*it)->OnEnter();
 }
@@ -198,6 +206,8 @@ void WifiModule::OnChestSimpleClick()
 void WifiModule::OnChestTripleClick()
 {
   // std::cout << "You chest triple clicked me" << std::endl;
+
+  boost::mutex::scoped_lock lock(_updateMutex);
 
   for (std::vector<IInputEventHandler*>::iterator it = _inputSubscribers.begin(); it != _inputSubscribers.end(); it++)
     (*it)->OnStart();
@@ -207,6 +217,8 @@ void WifiModule::OnNetworkServiceInputRequired(const std::string& eventName, con
 {
   // std::cout << "OnNetworkServiceInputRequired: " << inputRequest << std::endl;
 
+  boost::mutex::scoped_lock lock(_updateMutex);
+
   for (std::vector<INetworkEventHandler*>::iterator it = _networkSubscribers.begin(); it != _networkSubscribers.end(); it++)
     (*it)->OnNetworkServiceInputRequired();
 }
@@ -215,6 +227,8 @@ void WifiModule::OnNetworkConnectStatus(const std::string& eventName, const AL::
 {
   // std::cout << "OnNetworkConnectStatus: " << status << std::endl;
 
+  boost::mutex::scoped_lock lock(_updateMutex);
+
   for (std::vector<INetworkEventHandler*>::iterator it = _networkSubscribers.begin(); it != _networkSubscribers.end(); it++)
     (*it)->OnNetworkConnectStatus(status[1].toString());
 }
@@ -222,6 +236,8 @@ void WifiModule::OnNetworkConnectStatus(const std::string& eventName, const AL::
 void WifiModule::OnNetworkStatusChanged(const std::string& eventName, const AL::ALValue& status)
 {
  // std::cout << "OnNetworkStatusChanged: " << status << std::endl;
+
+  boost::mutex::scoped_lock lock(_updateMutex);
 
   for (std::vector<INetworkEventHandler*>::iterator it = _networkSubscribers.begin(); it != _networkSubscribers.end(); it++)
     (*it)->OnNetworkStatusChanged((std::string) status);
